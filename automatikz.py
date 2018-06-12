@@ -52,6 +52,11 @@ def tokenizeFA(fa):
     """Tokenize the textual representation of a finite automaton."""
     # split textual representation on whitespace
     faList = fa.split()
+
+    # use list comprehension to create individual sublists for each transition
+    # each sublist is of length three (start state, transition symbol, end state)
+    faList = [faList[i:i+3] for i in range(0, len(faList), 3)]
+
     return faList
 
 def main():
