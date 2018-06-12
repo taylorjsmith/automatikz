@@ -5,7 +5,7 @@
 __author__ = "Taylor J. Smith"
 __email__ = "tsmith@cs.queensu.ca"
 __status__ = "Development"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 ###############
 # Imports
@@ -48,6 +48,12 @@ def getRegExp():
     regExp = input()
     return regExp
 
+def tokenizeFA(fa):
+    """Tokenize the textual representation of a finite automaton."""
+    # split textual representation on whitespace
+    faList = fa.split()
+    return faList
+
 def main():
     """Main method."""
     # get regular expression as input
@@ -56,7 +62,10 @@ def main():
     # convert regular expression to textual representation of automaton
     fa = convertRegExpToFA(re)
 
-    print(fa.rstrip())
+    # tokenize textual representation of automaton
+    fa = tokenizeFA(fa)
+
+    print(fa)
 
 if __name__ == "__main__":
     main()
