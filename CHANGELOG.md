@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 - 2018-06-19
+### Added
+- Tokenization of the textual representation of an automaton.
+- Basic parsing functionality to organize states and transitions for future processing.
+- Basic parsing functionality to determine automaton attributes; start states, final states, etc.
+
 ## 0.2.0 - 2018-05-10
 ### Added
 - Grail integration (assuming Grail is installed on user's system).

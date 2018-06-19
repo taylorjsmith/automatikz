@@ -50,17 +50,36 @@ def getRegExp():
 
 def parseFA(fa):
     """Parse the tokenized finite automaton for future processing."""
+    # create lists to store states and transitions
+    stateList = list()
+    stateTransitionList = list()
+
+    # create sets to store start states and final states
+    startStateSet = set()
+    finalStateSet = set()
+
     # loop through tokens
     for i in range(0, len(fa)):
-        print(fa[i])
-
         # determine start states
         if fa[i][0] == "(START)":
-            print("Start state is " + fa[i][2])
+            startStateSet.add(fa[i][2])
 
         # determine final states
         if fa[i][2] == "(FINAL)":
-            print("Final state is " + fa[i][0])
+            finalStateSet.add(fa[i][0])
+
+        # add state to list if not already accounted for
+        if (fa[i][0] not in stateList) and (fa[i][0] != "(START)"):
+            stateList.append(fa[i][0])
+            stateTransitionList.append([fa[i][0]])
+
+        # associate transition with state in state list
+        if (fa[i][2] != "(FINAL)"):
+            for j in range(0, len(stateTransitionList)):
+                if stateTransitionList[j][0] == fa[i][0]:
+                    stateTransitionList[j].append([fa[i][2], fa[i][1]])
+
+    return stateTransitionList, startStateSet, finalStateSet
 
 def tokenizeFA(fa):
     """Tokenize the textual representation of a finite automaton."""
@@ -85,7 +104,11 @@ def main():
     fa = tokenizeFA(fa)
 
     # parse tokenized automaton to extract certain data for future use
-    parseFA(fa)
+    faParsed, startStateSet, finalStateSet = parseFA(fa)
+
+    print(faParsed)
+    print(startStateSet)
+    print(finalStateSet)
 
 if __name__ == "__main__":
     main()
