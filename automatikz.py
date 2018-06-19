@@ -48,6 +48,20 @@ def getRegExp():
     regExp = input()
     return regExp
 
+def parseFA(fa):
+    """Parse the tokenized finite automaton for future processing."""
+    # loop through tokens
+    for i in range(0, len(fa)):
+        print(fa[i])
+
+        # determine start states
+        if fa[i][0] == "(START)":
+            print("Start state is " + fa[i][2])
+
+        # determine final states
+        if fa[i][2] == "(FINAL)":
+            print("Final state is " + fa[i][0])
+
 def tokenizeFA(fa):
     """Tokenize the textual representation of a finite automaton."""
     # split textual representation on whitespace
@@ -70,7 +84,8 @@ def main():
     # tokenize textual representation of automaton
     fa = tokenizeFA(fa)
 
-    print(fa)
+    # parse tokenized automaton to extract certain data for future use
+    parseFA(fa)
 
 if __name__ == "__main__":
     main()
