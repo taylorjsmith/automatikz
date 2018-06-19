@@ -5,7 +5,7 @@
 __author__ = "Taylor J. Smith"
 __email__ = "tsmith@cs.queensu.ca"
 __status__ = "Development"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 ###############
 # Imports
@@ -48,6 +48,50 @@ def getRegExp():
     regExp = input()
     return regExp
 
+def parseFA(fa):
+    """Parse the tokenized finite automaton for future processing."""
+    # create lists to store states and transitions
+    stateList = list()
+    stateTransitionList = list()
+
+    # create sets to store start states and final states
+    startStateSet = set()
+    finalStateSet = set()
+
+    # loop through tokens
+    for i in range(0, len(fa)):
+        # determine start states
+        if fa[i][0] == "(START)":
+            startStateSet.add(fa[i][2])
+
+        # determine final states
+        if fa[i][2] == "(FINAL)":
+            finalStateSet.add(fa[i][0])
+
+        # add state to list if not already accounted for
+        if (fa[i][0] not in stateList) and (fa[i][0] != "(START)"):
+            stateList.append(fa[i][0])
+            stateTransitionList.append([fa[i][0]])
+
+        # associate transition with state in state list
+        if (fa[i][2] != "(FINAL)"):
+            for j in range(0, len(stateTransitionList)):
+                if stateTransitionList[j][0] == fa[i][0]:
+                    stateTransitionList[j].append([fa[i][2], fa[i][1]])
+
+    return stateTransitionList, startStateSet, finalStateSet
+
+def tokenizeFA(fa):
+    """Tokenize the textual representation of a finite automaton."""
+    # split textual representation on whitespace
+    faList = fa.split()
+
+    # use list comprehension to create individual sublists for each transition
+    # each sublist is of length three (start state, transition symbol, end state)
+    faList = [faList[i:i+3] for i in range(0, len(faList), 3)]
+
+    return faList
+
 def main():
     """Main method."""
     # get regular expression as input
@@ -56,7 +100,15 @@ def main():
     # convert regular expression to textual representation of automaton
     fa = convertRegExpToFA(re)
 
-    print(fa.rstrip())
+    # tokenize textual representation of automaton
+    fa = tokenizeFA(fa)
+
+    # parse tokenized automaton to extract certain data for future use
+    faParsed, startStateSet, finalStateSet = parseFA(fa)
+
+    print(faParsed)
+    print(startStateSet)
+    print(finalStateSet)
 
 if __name__ == "__main__":
     main()
