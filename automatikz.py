@@ -5,7 +5,7 @@
 __author__ = "Taylor J. Smith"
 __email__ = "tsmith@cs.queensu.ca"
 __status__ = "Development"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 ###############
 # Imports
@@ -41,6 +41,21 @@ def convertRegExpToFA(re):
         sys.exit(1)
 
     return stdoutData
+
+def generateTikzCode(stateTransitionList, startStateSet, finalStateSet):
+    """Generate TikZ figure code for a given automaton."""
+    code = ""
+
+    # write preamble code
+    code += "\\documentclass{article}\n\n\\usepackage{pgf}\n\\usepackage{tikz}\n\\usetikzlibrary{automata}\n\n\\begin{document}\n\n\\begin{tikzpicture}"
+
+    # write figure code
+    code += "\n"
+
+    # write postamble code
+    code += "\\end{tikzpicture}\n\n\\end{document}"
+
+    return code
 
 def getRegExp():
     """Get a regular expression as input."""
@@ -106,9 +121,10 @@ def main():
     # parse tokenized automaton to extract certain data for future use
     faParsed, startStateSet, finalStateSet = parseFA(fa)
 
-    print(faParsed)
-    print(startStateSet)
-    print(finalStateSet)
+    # generate TikZ figure code for automaton
+    figCode = generateTikzCode(faParsed, startStateSet, finalStateSet)
+
+    print(figCode)
 
 if __name__ == "__main__":
     main()
