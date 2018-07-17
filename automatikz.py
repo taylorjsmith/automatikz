@@ -47,15 +47,41 @@ def generateTikzCode(stateTransitionList, startStateSet, finalStateSet):
     code = ""
 
     # write preamble code
-    code += "\\documentclass{article}\n\n\\usepackage{pgf}\n\\usepackage{tikz}\n\\usetikzlibrary{automata}\n\n\\begin{document}\n\n\\begin{tikzpicture}"
+    code += "\\documentclass{article}\n\n\\usepackage{pgf}\n\\usepackage{tikz}\n\\usetikzlibrary{automata}\n\n\\begin{document}\n\n\\begin{tikzpicture}\n"
 
     # write figure code
-    code += "\n"
+    code += generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet)
 
     # write postamble code
     code += "\\end{tikzpicture}\n\n\\end{document}"
 
     return code
+
+def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
+    """Generate TikZ figure code for states of an automaton."""
+    stateCode = ""
+
+    # iterate through list of states
+    for i in range(len(stateTransitionList)):
+        # get "name" of current state
+        currStateTransitionPair = stateTransitionList[i]
+        currStateName = currStateTransitionPair[0]
+        
+        stateStatus = ""
+
+        # determine initial state status
+        if currStateName in startStateSet:
+            stateStatus += "initial,"
+        # default state string
+        stateStatus += "state"
+        # determine final state status
+        if currStateName in finalStateSet:
+            stateStatus += ",accepting"
+
+        # generate code for current state
+        stateCode += "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n"
+
+    return stateCode
 
 def getRegExp():
     """Get a regular expression as input."""
