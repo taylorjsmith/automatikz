@@ -51,6 +51,8 @@ def generateTikzCode(stateTransitionList, startStateSet, finalStateSet):
 
     # write figure code
     code += generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet)
+    code += "\n"
+    code += generateTikzCodeTransitions(stateTransitionList)
 
     # write postamble code
     code += "\\end{tikzpicture}\n\n\\end{document}"
@@ -82,6 +84,31 @@ def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
         stateCode += "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n"
 
     return stateCode
+
+def generateTikzCodeTransitions(stateTransitionList):
+    """Generate TikZ figure code for transitions of an automaton."""
+    transitionCode = ""
+
+    # iterate through list of states
+    for i in range(len(stateTransitionList)):
+        # get "name" of current state and sublist of transitions
+        currStateTransitionPair = stateTransitionList[i]
+        currStateName = currStateTransitionPair[0]
+
+        # if transitions from the current state exist
+        # (that is, if the sublist of transitions has length greater than one)
+        if len(currStateTransitionPair) > 1:
+            # iterate through sublist of transitions
+            for j in range(1, len(currStateTransitionPair)):
+                # get "name" of state being transitioned to and transition symbol
+                currTransition = currStateTransitionPair[j]
+                nextStateName = currTransition[0]
+                nextStateSymbol = currTransition[1]
+
+                # generate code for current transition
+                transitionCode += "\\path (q" + currStateName + ") edge node {" + nextStateSymbol + "} (q" + nextStateName + ");\n"
+
+    return transitionCode
 
 def getRegExp():
     """Get a regular expression as input."""
