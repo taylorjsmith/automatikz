@@ -105,8 +105,14 @@ def generateTikzCodeTransitions(stateTransitionList):
                 nextStateName = currTransition[0]
                 nextStateSymbol = currTransition[1]
 
+                transitionStatus = ""
+                
+                # check if transition is a loop and, if so, handle styling appropriately
+                if nextStateName == currStateName:
+                    transitionStatus = "[loop above] "
+
                 # generate code for current transition
-                transitionCode += "\\path (q" + currStateName + ") edge node {" + nextStateSymbol + "} (q" + nextStateName + ");\n"
+                transitionCode += "\\path (q" + currStateName + ") edge " + transitionStatus + "node {" + nextStateSymbol + "} (q" + nextStateName + ");\n"
 
     return transitionCode
 
