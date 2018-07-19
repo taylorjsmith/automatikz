@@ -70,10 +70,12 @@ def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
         currStateName = currStateTransitionPair[0]
         
         stateStatus = ""
+        startStateFlag = False
 
         # determine initial state status
         if currStateName in startStateSet:
             stateStatus += "initial,"
+            startStateFlag = True
         # default state string
         stateStatus += "state"
         # determine final state status
@@ -81,7 +83,14 @@ def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
             stateStatus += ",accepting"
 
         # generate code for current state
-        stateCode += "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n"
+        # if state is initial, prepend code instead of appending (to put initial states first)
+        if startStateFlag == True:
+            stateCode = "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n" + stateCode
+        else:
+            stateCode += "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n"
+
+        # reset flag
+        startStateFlag = False
 
     return stateCode
 
