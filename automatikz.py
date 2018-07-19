@@ -47,7 +47,7 @@ def generateTikzCode(stateTransitionList, startStateSet, finalStateSet):
     code = ""
 
     # write preamble code
-    code += "\\documentclass{article}\n\n\\usepackage{pgf}\n\\usepackage{tikz}\n\\usetikzlibrary{automata}\n\n\\begin{document}\n\n\\begin{tikzpicture}[->, auto]\n"
+    code += "\\documentclass{article}\n\n\\usepackage{pgf}\n\\usepackage{tikz}\n\\usetikzlibrary{automata}\n\n\\begin{document}\n\n\\begin{tikzpicture}[->, auto, node distance = 2cm]\n"
 
     # write figure code
     code += generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet)
