@@ -50,9 +50,10 @@ def generateTikzCode(stateTransitionList, startStateSet, finalStateSet):
     code += "\\documentclass{article}\n\n\\usepackage{pgf}\n\\usepackage{tikz}\n\\usetikzlibrary{automata}\n\n\\begin{document}\n\n\\begin{tikzpicture}[->, auto, node distance = 2cm]\n"
 
     # write figure code
-    code += generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet)
+    stateCode, stateOrderList = generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet)
+    code += stateCode
     code += "\n"
-    code += generateTikzCodeTransitions(stateTransitionList)
+    code += generateTikzCodeTransitions(stateTransitionList, stateOrderList)
 
     # write postamble code
     code += "\\end{tikzpicture}\n\n\\end{document}"
@@ -101,7 +102,7 @@ def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
         startStateFlag = False
 
     # combine two state ordering lists into one
-    stateList = initStateList + stateList
+    stateOrderList = initStateList + stateList
 
     modStateCode = ""
     lineNum = 0
@@ -114,7 +115,7 @@ def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
             indexNum = line.find(")")
 
             # insert the position code (position current state to the right of previous state)
-            line = line[:(indexNum + 1)] + " [right of=" + stateList[lineNum - 1] + "]" + line[(indexNum + 1):]
+            line = line[:(indexNum + 1)] + " [right of=" + stateOrderList[lineNum - 1] + "]" + line[(indexNum + 1):]
         
         # modify state code and move to next line
         modStateCode = modStateCode + line + "\n"
@@ -122,9 +123,9 @@ def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
 
     stateCode = modStateCode
 
-    return stateCode
+    return stateCode, stateOrderList
 
-def generateTikzCodeTransitions(stateTransitionList):
+def generateTikzCodeTransitions(stateTransitionList, stateOrderList):
     """Generate TikZ figure code for transitions of an automaton."""
     transitionCode = ""
 
