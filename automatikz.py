@@ -62,6 +62,8 @@ def generateTikzCode(stateTransitionList, startStateSet, finalStateSet):
 def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
     """Generate TikZ figure code for states of an automaton."""
     stateCode = ""
+    initStateList = []
+    stateList = []
 
     # iterate through list of states
     for i in range(len(stateTransitionList)):
@@ -89,8 +91,36 @@ def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
         else:
             stateCode += "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n"
 
+        # keep track of ordering of states
+        if startStateFlag == True:
+            initStateList += ["q" + currStateName]
+        else:
+            stateList += ["q" + currStateName]
+
         # reset flag
         startStateFlag = False
+
+    # combine two state ordering lists into one
+    stateList = initStateList + stateList
+
+    modStateCode = ""
+    lineNum = 0
+
+    # modify each line in state code to specify relative positioning
+    for line in stateCode.splitlines():
+        # if we are not looking at the first line of state code
+        if lineNum != 0:
+            # find the index in the line to insert the position code
+            indexNum = line.find(")")
+
+            # insert the position code (position current state to the right of previous state)
+            line = line[:(indexNum + 1)] + " [right of=" + stateList[lineNum - 1] + "]" + line[(indexNum + 1):]
+        
+        # modify state code and move to next line
+        modStateCode = modStateCode + line + "\n"
+        lineNum = lineNum + 1
+
+    stateCode = modStateCode
 
     return stateCode
 
