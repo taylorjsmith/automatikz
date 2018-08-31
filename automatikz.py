@@ -145,11 +145,19 @@ def generateTikzCodeTransitions(stateTransitionList, stateOrderList):
                 nextStateName = currTransition[0]
                 nextStateSymbol = currTransition[1]
 
+                # get states and indices for positioning check
+                currStateLabel = "q" + currStateName
+                nextStateLabel = "q" + nextStateName
+                currStateIndex = stateOrderList.index(currStateLabel)
+
                 transitionStatus = ""
                 
                 # check if transition is a loop and, if so, handle styling appropriately
                 if nextStateName == currStateName:
                     transitionStatus = "[loop above] "
+                # check if transitions are not next to each other and, if so, handle styling appropriately
+                elif ((currStateIndex + 1) <= len(stateOrderList)) and (nextStateLabel != stateOrderList[currStateIndex + 1]):
+                    transitionStatus = "[bend right] "
 
                 # generate code for current transition
                 transitionCode += "\\path (q" + currStateName + ") edge " + transitionStatus + "node {" + nextStateSymbol + "} (q" + nextStateName + ");\n"
