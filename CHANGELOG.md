@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0 - 2018-08-30
+### Added
+- TikZ code generation
+- Basic positioning and styling capabilities
+
 ## 0.3.0 - 2018-06-19
 ### Added
 - Tokenization of the textual representation of an automaton.

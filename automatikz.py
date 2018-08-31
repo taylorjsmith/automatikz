@@ -5,7 +5,7 @@
 __author__ = "Taylor J. Smith"
 __email__ = "tsmith@cs.queensu.ca"
 __status__ = "Development"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 ###############
 # Imports
@@ -41,6 +41,128 @@ def convertRegExpToFA(re):
         sys.exit(1)
 
     return stdoutData
+
+def generateTikzCode(stateTransitionList, startStateSet, finalStateSet):
+    """Generate TikZ figure code for a given automaton."""
+    code = ""
+
+    # write preamble code
+    code += "\\documentclass{article}\n\n\\usepackage{pgf}\n\\usepackage{tikz}\n\\usetikzlibrary{automata}\n\n\\begin{document}\n\n\\begin{tikzpicture}[->, auto, node distance = 2cm]\n"
+
+    # write figure code
+    stateCode, stateOrderList = generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet)
+    code += stateCode
+    code += "\n"
+    code += generateTikzCodeTransitions(stateTransitionList, stateOrderList)
+
+    # write postamble code
+    code += "\\end{tikzpicture}\n\n\\end{document}"
+
+    return code
+
+def generateTikzCodeStates(stateTransitionList, startStateSet, finalStateSet):
+    """Generate TikZ figure code for states of an automaton."""
+    stateCode = ""
+    initStateList = []
+    stateList = []
+
+    # iterate through list of states
+    for i in range(len(stateTransitionList)):
+        # get "name" of current state
+        currStateTransitionPair = stateTransitionList[i]
+        currStateName = currStateTransitionPair[0]
+        
+        stateStatus = ""
+        startStateFlag = False
+
+        # determine initial state status
+        if currStateName in startStateSet:
+            stateStatus += "initial,"
+            startStateFlag = True
+        # default state string
+        stateStatus += "state"
+        # determine final state status
+        if currStateName in finalStateSet:
+            stateStatus += ",accepting"
+
+        # generate code for current state
+        # if state is initial, prepend code instead of appending (to put initial states first)
+        if startStateFlag == True:
+            stateCode = "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n" + stateCode
+        else:
+            stateCode += "\\node[" + stateStatus + "] (q" + currStateName + ") {$q_{" + currStateName + "}$};\n"
+
+        # keep track of ordering of states
+        if startStateFlag == True:
+            initStateList += ["q" + currStateName]
+        else:
+            stateList += ["q" + currStateName]
+
+        # reset flag
+        startStateFlag = False
+
+    # combine two state ordering lists into one
+    stateOrderList = initStateList + stateList
+
+    modStateCode = ""
+    lineNum = 0
+
+    # modify each line in state code to specify relative positioning
+    for line in stateCode.splitlines():
+        # if we are not looking at the first line of state code
+        if lineNum != 0:
+            # find the index in the line to insert the position code
+            indexNum = line.find(")")
+
+            # insert the position code (position current state to the right of previous state)
+            line = line[:(indexNum + 1)] + " [right of=" + stateOrderList[lineNum - 1] + "]" + line[(indexNum + 1):]
+        
+        # modify state code and move to next line
+        modStateCode = modStateCode + line + "\n"
+        lineNum = lineNum + 1
+
+    stateCode = modStateCode
+
+    return stateCode, stateOrderList
+
+def generateTikzCodeTransitions(stateTransitionList, stateOrderList):
+    """Generate TikZ figure code for transitions of an automaton."""
+    transitionCode = ""
+
+    # iterate through list of states
+    for i in range(len(stateTransitionList)):
+        # get "name" of current state and sublist of transitions
+        currStateTransitionPair = stateTransitionList[i]
+        currStateName = currStateTransitionPair[0]
+
+        # if transitions from the current state exist
+        # (that is, if the sublist of transitions has length greater than one)
+        if len(currStateTransitionPair) > 1:
+            # iterate through sublist of transitions
+            for j in range(1, len(currStateTransitionPair)):
+                # get "name" of state being transitioned to and transition symbol
+                currTransition = currStateTransitionPair[j]
+                nextStateName = currTransition[0]
+                nextStateSymbol = currTransition[1]
+
+                # get states and indices for positioning check
+                currStateLabel = "q" + currStateName
+                nextStateLabel = "q" + nextStateName
+                currStateIndex = stateOrderList.index(currStateLabel)
+
+                transitionStatus = ""
+                
+                # check if transition is a loop and, if so, handle styling appropriately
+                if nextStateName == currStateName:
+                    transitionStatus = "[loop above] "
+                # check if transitions are not next to each other and, if so, handle styling appropriately
+                elif ((currStateIndex + 1) <= len(stateOrderList)) and (nextStateLabel != stateOrderList[currStateIndex + 1]):
+                    transitionStatus = "[bend right] "
+
+                # generate code for current transition
+                transitionCode += "\\path (q" + currStateName + ") edge " + transitionStatus + "node {" + nextStateSymbol + "} (q" + nextStateName + ");\n"
+
+    return transitionCode
 
 def getRegExp():
     """Get a regular expression as input."""
@@ -106,9 +228,10 @@ def main():
     # parse tokenized automaton to extract certain data for future use
     faParsed, startStateSet, finalStateSet = parseFA(fa)
 
-    print(faParsed)
-    print(startStateSet)
-    print(finalStateSet)
+    # generate TikZ figure code for automaton
+    figCode = generateTikzCode(faParsed, startStateSet, finalStateSet)
+
+    print(figCode)
 
 if __name__ == "__main__":
     main()
